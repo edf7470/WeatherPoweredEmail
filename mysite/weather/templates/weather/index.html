@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Weather Powered Email</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 </head>
+
 <body>
 
-<form action="{% url 'subscribe' %}" method="post">
-    {% csrf_token %}
-    Email Address</br>
-    <input type="text" name="email_address"><br><br>
-    Location </br>
-    <input type="text" name="location"><br><br>
-<input type="submit" value="Subscribe" />
-</form>
-
+<div class="container">
+    <h2>Weather Powered Email</h2>
+    <div class="well well-lg">
+        <form action="{% url 'subscribe' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Subscribe" />
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

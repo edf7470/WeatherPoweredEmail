@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from .forms import SubscriptionForm
 
 
 def index(request):
-    return render(request, "weather\index.html")
+    form = SubscriptionForm()
+    return render(request, 'weather\index.html', {'form': form})
