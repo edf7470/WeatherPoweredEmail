@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Powered Email</title>
+</head>
+<body>
+
+<form action="{% url 'subscribe' %}" method="post">
+    {% csrf_token %}
+    Email Address</br>
+    <input type="text" name="email_address"><br><br>
+    Location </br>
+    <input type="text" name="location"><br><br>
+<input type="submit" value="Subscribe" />
+</form>
+
+
+</body>
+</html>
