@@ -6,8 +6,14 @@
 </head>
 <body>
 
+{% if success %}
 Congratulations {{ email_address }}!</br>
 You have successfully subscribed to Weather Powered Email!
 
+{% else %}
+Sorry, {{ email_address }} is already in use.</br>
+Try again with a different email address.
+
+{% endif %}
 </body>
 </html>

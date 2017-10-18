@@ -13,7 +13,15 @@ class SubscriptionForm(forms.ModelForm):
             'location',
         )
 
-    def clean_email(self):
+    def clean(self):
+        print("clean has been called")
+        cleaned_data = super(SubscriptionForm, self).clean()
+        email_address = cleaned_data.get("email_address")
+        location = cleaned_data.get("location")
+        return cleaned_data
+
+    def clean_email_address(self):
+        print("cleaning email address")
         # Get the email
         email_address = self.cleaned_data.get('email_address')
 
@@ -22,9 +30,9 @@ class SubscriptionForm(forms.ModelForm):
             match = Subscription.objects.get(email_address=email_address)
         except Subscription.DoesNotExist:
             # Unable to find a user, this is fine
+            print("Email address is FREE for you to use! - yayyyyy")
             return email_address
 
+        print("Email address is already in use! - Validation ERROR")
         # A user was found with this as a username, raise an error.
         raise forms.ValidationError('This email address is already in use.')
-
-
