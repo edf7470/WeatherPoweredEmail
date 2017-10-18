@@ -13,5 +13,5 @@ class Subscription(models.Model):
     email_address = models.EmailField(verbose_name="Email Address")
     location = models.CharField(max_length=20, choices=TOP_100_CITIES)
 
-
-
+    def __str__(self):
+        return self.email_address

@@ -13,4 +13,18 @@ class SubscriptionForm(forms.ModelForm):
             'location',
         )
 
+    def clean_email(self):
+        # Get the email
+        email_address = self.cleaned_data.get('email_address')
+
+        # Check to see if any users already exist with this email as a username.
+        try:
+            match = Subscription.objects.get(email_address=email_address)
+        except Subscription.DoesNotExist:
+            # Unable to find a user, this is fine
+            return email_address
+
+        # A user was found with this as a username, raise an error.
+        raise forms.ValidationError('This email address is already in use.')
+
 

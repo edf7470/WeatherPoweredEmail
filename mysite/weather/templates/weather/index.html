@@ -12,7 +12,7 @@
 <div class="container">
     <h2>Weather Powered Email</h2>
     <div class="well well-lg">
-        <form action="{% url 'subscribe' %}" method="post">
+        <form action="{% url 'weather:subscribe' %}" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Subscribe" />
