@@ -1,19 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'weather/style.css' %}" />
+
 <head>
     <meta charset="UTF-8">
-    <title>Something!</title>
+    <title>
+        {% if success %}
+        Success!
+
+        {% else %}
+        Try Again
+
+        {% endif %}
+
+    </title>
 </head>
 <body>
 
 {% if success %}
-Congratulations {{ email_address }}!</br>
-You have successfully subscribed to Weather Powered Email!
+<h1>Congratulations, {{ email_address }}!</h1>
+You have successfully subscribed to Weather Powered Email!<br><br>
 
 {% else %}
-Sorry, {{ email_address }} is already in use.</br>
-Try again with a different email address.
+<h1>Sorry!</h1>
+{{ email_address }} is already in use.<br>
+Try again with a different email address.<br><br>
 
 {% endif %}
+
+<a href="{% url 'weather:index' %}" class="button">Try Again</a>
+
 </body>
 </html>
