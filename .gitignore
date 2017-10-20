@@ -1,3 +1,4 @@
+*.pyc
 mysite/db.sqlite3
 mysite/mysite/__pycache__/*
 mysite/weather/__pycache__/*
