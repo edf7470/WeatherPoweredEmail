@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from weather.models import Subscription
+from django.core.mail import send_mass_mail
 
 
 class Command(BaseCommand):
@@ -21,6 +22,13 @@ class Command(BaseCommand):
             default=False,
             help='Print all generated newsletters with relative email addresses',
         )
+        parser.add_argument(
+            '--send_email',
+            action='store_true',
+            dest='send_email',
+            default=False,
+            help='Send email to all subscribers',
+        )
 
     def handle(self, *args, **options):
         subs = Subscription.objects.all()
@@ -29,7 +37,21 @@ class Command(BaseCommand):
                 self.stdout.write(sub.email_address)
             self.stdout.write('Printed all Email Addresses!')
         elif options['print_generated_newsletter']:
+            i = 0
             for sub in subs:
-                # self.stdout.write(sub.email_address)
                 self.stdout.write(sub.generate_newsletter(), ending='\n-----\n')
-            self.stdout.write('Printed all Newsletters!')
+                i += 1
+            self.stdout.write('Printed ' + i.__str__() + ' Newsletters.')
+        elif options['send_email']:
+            messagelist = list()
+            for sub in subs:
+                subject = 'TEN-Its a DEALS kinda day!'
+                content = sub.generate_newsletter()
+                from_address = 'weatherDeals@test.com'
+                to_addresses = [sub.email_address]
+                message = (subject, content, from_address, to_addresses)
+                messagelist.append(message)
+                self.stdout.write('Prepared email to: ' + sub.email_address)
+            datatuple = tuple(messagelist)
+            i = send_mass_mail(datatuple, fail_silently=False)
+            self.stdout.write('Successfully sent ' + i.__str__() + ' emails.')
