@@ -1,0 +1,2 @@
+Hello {{ sub.email_address }},
+Nice day out today in {{ sub.location }}! Enjoy a discount on us.

@@ -16,5 +16,5 @@ class Subscription(models.Model):
     def __str__(self):
         return self.email_address
 
-    def generate_newsletter(self):
-        return "Hello " + self.email_address + ",\nNice day out today in " + self.location + "! Enjoy a discount, on us."
+    #def generate_newsletter(self):
+    #    return "Hello " + self.email_address + ",\nNice day out today in " + self.location + "! Enjoy a discount, on us."
