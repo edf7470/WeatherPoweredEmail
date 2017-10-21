@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from weather.models import Subscription
 from django.core.mail import send_mass_mail
 from django.template.loader import render_to_string
+import json
 
 
 class Command(BaseCommand):
@@ -30,6 +31,13 @@ class Command(BaseCommand):
             default=False,
             help='Send email to all subscribers',
         )
+        parser.add_argument(
+            '--print_weather',
+            action='store_true',
+            dest='print_weather',
+            default=False,
+            help='Print weather data from subscriber\'s location',
+        )
 
     def handle(self, *args, **options):
         subs = Subscription.objects.all()
@@ -44,20 +52,32 @@ class Command(BaseCommand):
                 i += 1
             self.stdout.write('Printed ' + i.__str__() + ' Newsletters.')
 
-        # messagelist represents the list of tuples that hold (subject, content, from_address, to_address) used forsending an email to a subscriber.
-        messagelist = list()
-        for sub in subs:
-            subject = 'ELEVEN-Its a DEALS kinda day!'
-            context = {
-                'sub': sub
-            }
-            content = render_to_string('weather/emailbody.txt', context)
-            #content = sub.generate_newsletter()
-            from_address = 'weatherDeals@test.com'
-            to_addresses = [sub.email_address]
-            message = (subject, content, from_address, to_addresses)
-            messagelist.append(message)
-            self.stdout.write('Prepared email to: ' + sub.email_address)
-        datatuple = tuple(messagelist)
-        i = send_mass_mail(datatuple, fail_silently=False)
-        self.stdout.write('Successfully sent ' + i.__str__() + ' emails.')
+        elif options['print_weather']:
+            i = 0
+            for sub in subs:
+                self.stdout.write(sub.email_address)
+                weather = sub.get_weather_conditions()[0]
+                temperature = sub.get_weather_conditions()[1].__str__()
+                self.stdout.write("Looks " + weather + " out today! Don't mind the temperature of " + temperature + ".", ending='\n-----\n')
+                #self.stdout.write(json.dumps(sub.get_weather_conditions(), indent=4))
+                i += 1
+            self.stdout.write('Printed ' + i.__str__() + ' Newsletters.')
+
+        elif options['send_email']:
+            # messagelist represents the list of tuples that hold (subject, content, from_address, to_address) used forsending an email to a subscriber.
+            messagelist = list()
+            for sub in subs:
+                subject = 'ELEVEN-Its a DEALS kinda day!'
+                context = {
+                    'sub': sub
+                }
+                content = render_to_string('weather/emailbody.txt', context)
+                #content = sub.generate_newsletter()
+                from_address = 'weatherDeals@test.com'
+                to_addresses = [sub.email_address]
+                message = (subject, content, from_address, to_addresses)
+                messagelist.append(message)
+                self.stdout.write('Prepared email to: ' + sub.email_address)
+            datatuple = tuple(messagelist)
+            i = send_mass_mail(datatuple, fail_silently=False)
+            self.stdout.write('Successfully sent ' + i.__str__() + ' emails.')

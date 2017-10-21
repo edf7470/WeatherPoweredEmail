@@ -1,4 +1,7 @@
 from django.db import models
+import requests
+from mysite import settings
+
 
 # Array of tuples lists the "Location" options
 TOP_100_CITIES = (
@@ -18,3 +21,14 @@ class Subscription(models.Model):
 
     #def generate_newsletter(self):
     #    return "Hello " + self.email_address + ",\nNice day out today in " + self.location + "! Enjoy a discount, on us."
+    def get_weather_conditions(self):
+        state = 'NY'
+        city = 'New_York'
+        # use python requests to send GET request to wunderground API
+        r = requests.get('http://api.wunderground.com/api/' + settings.WUNDERGROUND_KEY + '/conditions/q/' + state + '/' + city + '.json')
+        conditions = r.json()
+        weather = conditions['current_observation']['weather'].lower()
+        temperature = conditions['current_observation']['temp_f']
+        return [weather, temperature]
+
+
