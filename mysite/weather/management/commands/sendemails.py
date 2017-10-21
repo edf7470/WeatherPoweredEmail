@@ -11,16 +11,16 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         # parser.add_argument('poll_id', nargs='+', type=int)
         parser.add_argument(
-            '--print_addresses',
+            '--print_address',
             action='store_true',
-            dest='print_addresses',
+            dest='print_address',
             default=False,
-            help='Print all subscription email addresses',
+            help='Print all subscribers\' email addresses',
         )
         parser.add_argument(
-            '--print_generated_newsletter',
+            '--print_newsletter',
             action='store_true',
-            dest='print_generated_newsletter',
+            dest='print_newsletter',
             default=False,
             help='Print all generated newsletters with relative email addresses',
         )
@@ -36,39 +36,52 @@ class Command(BaseCommand):
             action='store_true',
             dest='print_weather',
             default=False,
-            help='Print weather data from subscriber\'s location',
+            help='Print weather data from subscribers\' locations',
         )
 
     def handle(self, *args, **options):
         subs = Subscription.objects.all()
-        if options['print_addresses']:
-            for sub in subs:
-                self.stdout.write(sub.email_address)
-            self.stdout.write('Printed all Email Addresses!')
-        elif options['print_generated_newsletter']:
+        if options['print_address']:
+            self.stdout.write('- Printing all Email Addresses.')
             i = 0
             for sub in subs:
-                self.stdout.write(sub.generate_newsletter(), ending='\n-----\n')
+                self.stdout.write(sub.email_address)
                 i += 1
-            self.stdout.write('Printed ' + i.__str__() + ' Newsletters.')
+            self.stdout.write('- Printed ' + i.__str__() + ' Email Addresses.')
 
         elif options['print_weather']:
+            self.stdout.write('- Printing all Weather Data.')
             i = 0
             for sub in subs:
+                weather_conditions = sub.get_weather_conditions()
                 self.stdout.write(sub.email_address)
-                weather = sub.get_weather_conditions()[0]
-                temperature = sub.get_weather_conditions()[1].__str__()
-                self.stdout.write("Looks " + weather + " out today! Don't mind the temperature of " + temperature + ".", ending='\n-----\n')
-                #self.stdout.write(json.dumps(sub.get_weather_conditions(), indent=4))
+                self.stdout.write('Weather: ' + weather_conditions[0])
+                self.stdout.write('Temperature: ' + weather_conditions[1].__str__(), ending='\n-----\n')
                 i += 1
-            self.stdout.write('Printed ' + i.__str__() + ' Newsletters.')
+            self.stdout.write('- Printed ' + i.__str__() + ' subscribers\' Weather Data.')
+
+        elif options['print_newsletter']:
+            self.stdout.write('- Printing all Newsletters.')
+            i = 0
+            for sub in subs:
+                weather = sub.get_weather_conditions()[0]
+                context = {
+                    'sub': sub,
+                    'weather': weather,
+                }
+                content = render_to_string('weather/emailbody.txt', context)
+                self.stdout.write(content, ending='\n-----\n')
+                i += 1
+            self.stdout.write('- Printed ' + i.__str__() + ' Newsletters.')
 
         elif options['send_email']:
             # messagelist represents the list of tuples that hold (subject, content, from_address, to_address) used forsending an email to a subscriber.
             messagelist = list()
             for sub in subs:
-                subject = 'ELEVEN-Its a DEALS kinda day!'
+                subject = 'Its a DEALS kinda day!'
+                weather = 'sunny'
                 context = {
+                    'weather': weather,
                     'sub': sub
                 }
                 content = render_to_string('weather/emailbody.txt', context)

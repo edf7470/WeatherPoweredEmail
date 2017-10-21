@@ -1,2 +1,8 @@
 Hello {{ sub.email_address }},
-Nice day out today in {{ sub.location }}! Enjoy a discount on us.
+{% if weather == "good" %}
+It's nice out! Enjoy a discount on us.
+{% elif weather == "bad" %}
+Not so nice out? That's okay, enjoy a discount on us.
+{% else %}
+Enjoy a discount on us.
+{% endif %}
