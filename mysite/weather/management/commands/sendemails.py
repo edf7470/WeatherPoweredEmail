@@ -11,86 +11,89 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         # parser.add_argument('poll_id', nargs='+', type=int)
         parser.add_argument(
+            '--print_all',
+            action='store_true',
+            dest='print_all',
+            default=False,
+            help='Print address, newsletter, weather.',
+        )
+        parser.add_argument(
             '--print_address',
             action='store_true',
             dest='print_address',
             default=False,
-            help='Print all subscribers\' email addresses',
+            help='Print all subscribers\' email addresses.',
         )
         parser.add_argument(
             '--print_newsletter',
             action='store_true',
             dest='print_newsletter',
             default=False,
-            help='Print all generated newsletters with relative email addresses',
-        )
-        parser.add_argument(
-            '--send_email',
-            action='store_true',
-            dest='send_email',
-            default=False,
-            help='Send email to all subscribers',
+            help='Print all generated newsletters.',
         )
         parser.add_argument(
             '--print_weather',
             action='store_true',
             dest='print_weather',
             default=False,
-            help='Print weather data from subscribers\' locations',
+            help='Print weather data (weather condition & temperature) from subscribers\' locations.',
+        )
+        parser.add_argument(
+            '--no_send',
+            action='store_true',
+            dest='no_send',
+            default=False,
+            help='Print data, without sending emails out.',
         )
 
     def handle(self, *args, **options):
-        subs = Subscription.objects.all()
-        if options['print_address']:
-            self.stdout.write('- Printing all Email Addresses.')
-            i = 0
-            for sub in subs:
-                self.stdout.write(sub.email_address)
-                i += 1
-            self.stdout.write('- Printed ' + i.__str__() + ' Email Addresses.')
+        print_formatting = True
+        if options['print_all']:
+            options['print_address'] = True
+            options['print_weather'] = True
+            options['print_newsletter'] = True
 
-        elif options['print_weather']:
-            self.stdout.write('- Printing all Weather Data.')
-            i = 0
-            for sub in subs:
-                weather_conditions = sub.get_weather_conditions()
-                self.stdout.write(sub.email_address)
-                self.stdout.write('Weather: ' + weather_conditions[0])
-                self.stdout.write('Temperature: ' + weather_conditions[1].__str__(), ending='\n-----\n')
-                i += 1
-            self.stdout.write('- Printed ' + i.__str__() + ' subscribers\' Weather Data.')
+        if not options['print_all'] and not options['print_address'] and not options['print_weather'] and not options['print_newsletter']:
+            print_formatting = False
 
-        elif options['print_newsletter']:
-            self.stdout.write('- Printing all Newsletters.')
-            i = 0
-            for sub in subs:
-                weather = sub.get_weather_conditions()[0]
-                context = {
-                    'sub': sub,
-                    'weather': weather,
-                }
-                content = render_to_string('weather/emailbody.txt', context)
-                self.stdout.write(content, ending='\n-----\n')
-                i += 1
-            self.stdout.write('- Printed ' + i.__str__() + ' Newsletters.')
-
-        elif options['send_email']:
-            # messagelist represents the list of tuples that hold (subject, content, from_address, to_address) used forsending an email to a subscriber.
+        if not options['no_send']:
             messagelist = list()
-            for sub in subs:
+        if print_formatting:
+            self.stdout.write('----------------------------------')
+        i = 0
+        subs = Subscription.objects.all()
+        for sub in subs:
+            weather_conditions = sub.get_weather_conditions()
+            context = {
+                'sub': sub,
+                'weather': weather_conditions,
+            }
+            content = render_to_string('weather/emailbody.txt', context)
+            if options['print_address']:
+                # email address
+                self.stdout.write('Email Address: ' + sub.email_address)
+            if options['print_weather']:
+                # weather
+                self.stdout.write('Weather: ' + weather_conditions[0])
+                self.stdout.write('Temperature: ' + weather_conditions[1].__str__())
+            if options['print_newsletter']:
+                # Newsletter
+                self.stdout.write('Newsletter:')
+                self.stdout.write(content)
+            if not options['no_send']:
+                # send email
                 subject = 'Its a DEALS kinda day!'
-                weather = 'sunny'
-                context = {
-                    'weather': weather,
-                    'sub': sub
-                }
-                content = render_to_string('weather/emailbody.txt', context)
-                #content = sub.generate_newsletter()
                 from_address = 'weatherDeals@test.com'
                 to_addresses = [sub.email_address]
                 message = (subject, content, from_address, to_addresses)
                 messagelist.append(message)
                 self.stdout.write('Prepared email to: ' + sub.email_address)
+            if print_formatting:
+                self.stdout.write('----------------------------------')
+            i += 1
+        if not options['no_send']:
             datatuple = tuple(messagelist)
             i = send_mass_mail(datatuple, fail_silently=False)
             self.stdout.write('Successfully sent ' + i.__str__() + ' emails.')
+        elif print_formatting:
+            self.stdout.write('Printed data for ' + i.__str__() + ' Subscriptions.')
