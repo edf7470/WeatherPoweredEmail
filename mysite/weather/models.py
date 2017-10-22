@@ -3,6 +3,7 @@ from mysite import settings
 import requests
 import datetime
 import time
+import math
 
 
 # Array of tuples lists the "Location" options
@@ -125,6 +126,22 @@ def get_average_weather_for_date(date, location_breakdown):
         # Calculate average temperature
         average = running_sum/year_count
         return average
+
+
+# Return True if current temp is 5 or more degrees colder than the historical average temp for that date/location
+def is_colder_than_average(current_temp, current_date, location_breakdown):
+    average_temp = get_average_weather_for_date(current_date, location_breakdown)
+    temp_diff = math.fabs(current_temp - average_temp)
+    print("average: " + average_temp.__str__())
+    print("temp diff: " + temp_diff.__str__())
+    return (current_temp < average_temp) & (temp_diff >= 5)
+
+
+# Return True if current temp is 5 or more degrees hotter than the historical average temp for that date/location
+def is_hotter_than_average(current_temp, current_date, location_breakdown):
+    average_temp = get_average_weather_for_date(current_date, location_breakdown)
+    temp_diff = math.fabs(current_temp - average_temp)
+    return (current_temp > average_temp) & (temp_diff >= 5)
 
 
 class Subscription(models.Model):

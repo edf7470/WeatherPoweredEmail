@@ -81,7 +81,7 @@ class SubscriptionModelTests(TestCase):
         self.assertEqual(test_weather_conditions[0], expected[0])
 
     def test_get_weather_conditions_bad_state_input(self):
-        sub = Subscription(email_address='somethingG@gmail.com', location='XX,New_York')
+        sub = Subscription(email_address='somethingH@gmail.com', location='XX,New_York')
         weather_conditions = sub.get_weather_conditions()
         expected = ['neutral', None]
         self.assertListEqual(weather_conditions, expected, "Bad location input should return a list: ['neutral', None]")
@@ -98,7 +98,7 @@ class SubscriptionModelTests(TestCase):
     # history - 1
     def test_get_api_history_bad_date_input(self):
         YYYYMMDD = '2016102'
-        sub = Subscription(email_address='somethingI@gmail.com', location='TX,Dallas')
+        sub = Subscription(email_address='somethingJ@gmail.com', location='TX,Dallas')
         location_breakdown = sub.get_location_breakdown()
         history_json = models.get_api_history(YYYYMMDD, location_breakdown)
         self.assertEqual(None,history_json)
@@ -106,19 +106,59 @@ class SubscriptionModelTests(TestCase):
     # Test get_average_weather_for_date()
     # history - 5
     def test_get_average_weather_for_date(self):
-        sub = Subscription(email_address='somethingH@gmail.com', location='NY,New_York')
+        sub = Subscription(email_address='somethingK@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
-        date = datetime.date(2017,10,21)
+        date = datetime.date(2017, 10, 21)
         tested = models.get_average_weather_for_date(date, location_breakdown)
         expected = 61.2;
         self.assertEqual(tested, expected, "Average temperature not correctly calculated.")
 
     # history - 0 (possibly more)
     def test_get_average_weather_for_date_bad_date_input(self):
-        sub = Subscription(email_address='somethingH@gmail.com', location='NY,New_York')
+        sub = Subscription(email_address='somethingL@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
-        date = datetime.date(201,10,21)
+        date = datetime.date(201, 10, 21)
         tested = models.get_average_weather_for_date(date, location_breakdown)
         expected = None;
         self.assertEqual(tested, expected, "Average temperature not correctly calculated.")
+
+    # Test is_colder_than_average()
+    def test_is_colder_than_average_true(self):
+        current_temp = 10
+        current_date = datetime.date(2016, 7, 1)
+        sub = Subscription(email_address='somethingM@gmail.com', location='NY,New_York')
+        location_breakdown = sub.get_location_breakdown()
+        is_colder = models.is_colder_than_average(current_temp, current_date, location_breakdown)
+        self.assertTrue(is_colder)
+
+    def test_is_colder_than_average_false(self):
+        current_temp = 100
+        current_date = datetime.date(2016, 1, 1)
+        sub = Subscription(email_address='somethingN@gmail.com', location='NY,New_York')
+        location_breakdown = sub.get_location_breakdown()
+        is_colder = models.is_colder_than_average(current_temp, current_date, location_breakdown)
+        self.assertFalse(is_colder)
+
+    # Test is_hotter_than_average()
+    def test_is_hotter_than_average_true(self):
+        current_temp = 100
+        current_date = datetime.date(2016, 1, 1)
+        sub = Subscription(email_address='somethingO@gmail.com', location='NY,New_York')
+        location_breakdown = sub.get_location_breakdown()
+        is_hotter = models.is_hotter_than_average(current_temp, current_date, location_breakdown)
+        self.assertTrue(is_hotter)
+
+    def test_is_hotter_than_average_false(self):
+        current_temp = 10
+        current_date = datetime.date(2016, 7, 1)
+        sub = Subscription(email_address='somethingP@gmail.com', location='NY,New_York')
+        location_breakdown = sub.get_location_breakdown()
+        is_hotter = models.is_hotter_than_average(current_temp, current_date, location_breakdown)
+        self.assertFalse(is_hotter)
+
+
+
+
+
+
 
