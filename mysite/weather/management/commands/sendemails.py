@@ -69,6 +69,10 @@ class Command(BaseCommand):
                 'weather': weather_conditions,
             }
             content = render_to_string('weather/emailbody.txt', context)
+            subject_context = {
+                'weather': weather_conditions,
+            }
+            subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
             if options['print_address']:
                 # email address
                 self.stdout.write('Email Address: ' + sub.email_address)
@@ -79,10 +83,12 @@ class Command(BaseCommand):
             if options['print_newsletter']:
                 # Newsletter
                 self.stdout.write('Newsletter:')
+                self.stdout.write('Content:')
                 self.stdout.write(content)
+                self.stdout.write('Subject:')
+                self.stdout.write(subject)
             if not options['no_send']:
                 # send email
-                subject = 'Its a DEALS kinda day!'
                 from_address = 'weatherDeals@test.com'
                 to_addresses = [sub.email_address]
                 message = (subject, content, from_address, to_addresses)
