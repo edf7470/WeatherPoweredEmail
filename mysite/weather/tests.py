@@ -5,6 +5,8 @@ from .models import Subscription
 import datetime
 import time
 
+from django.template.loader import render_to_string
+
 
 class SubscriptionModelTests(TestCase):
 
@@ -73,18 +75,20 @@ class SubscriptionModelTests(TestCase):
         else:
             # find 'weather' value in json response
             weather_api = c_json['current_observation']['weather'].lower()
-            weather = models.simplify_api_weather(weather_api)
+            w_simple = models.simplify_api_weather(weather_api)
             # find 'temp_f' (temperature fahrenheit) value in json response
             temperature = c_json['current_observation']['temp_f']
-        expected = [weather, temperature]
+            current_date = datetime.datetime.now().date()
+            t_simple = models.simplify_api_temp(temperature, current_date, sub.get_location_breakdown())
+        expected = [w_simple, t_simple]
         self.assertAlmostEqual(test_weather_conditions[1],expected[1],delta=1)
         self.assertEqual(test_weather_conditions[0], expected[0])
 
     def test_get_weather_conditions_bad_state_input(self):
         sub = Subscription(email_address='somethingH@gmail.com', location='XX,New_York')
         weather_conditions = sub.get_weather_conditions()
-        expected = ['neutral', None]
-        self.assertListEqual(weather_conditions, expected, "Bad location input should return a list: ['neutral', None]")
+        expected = ['neutral', 'neutral']
+        self.assertListEqual(weather_conditions, expected, "Bad location input should return a list: ['neutral', 'neutral']")
 
     # Test get_api_history()
     # history - 1
@@ -155,6 +159,91 @@ class SubscriptionModelTests(TestCase):
         location_breakdown = sub.get_location_breakdown()
         is_hotter = models.is_hotter_than_average(current_temp, current_date, location_breakdown)
         self.assertFalse(is_hotter)
+
+    # Test emailsubject.txt
+    def test_emailsubject_txt_bad_bad(self):
+        weather_conditions = ['bad', 'bad']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('Not so nice out?' in subject)
+
+    def test_emailsubject_txt_bad_good(self):
+        weather_conditions = ['bad', 'good']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('Not so nice out?' in subject)
+
+    def test_emailsubject_txt_bad_neutral(self):
+        weather_conditions = ['bad', 'neutral']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('Not so nice out?' in subject)
+
+    def test_emailsubject_txt_good_good(self):
+        weather_conditions = ['good', 'good']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('It\'s nice out!' in subject)
+
+    def test_emailsubject_txt_good_bad(self):
+        weather_conditions = ['good', 'bad']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('It\'s nice out!' in subject)
+
+
+    def test_emailsubject_txt_good_neutral(self):
+        weather_conditions = ['good', 'neutral']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('It\'s nice out!' in subject)
+
+    def test_emailsubject_txt_neutral_neutral(self):
+        weather_conditions = ['neutral', 'neutral']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('Not so nice out?' not in subject)
+        self.assertTrue('It\'s nice out!' not in subject)
+
+    def test_emailsubject_txt_neutral_bad(self):
+        weather_conditions = ['neutral', 'bad']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('Not so nice out?' in subject)
+
+    def test_emailsubject_txt_neutral_good(self):
+        weather_conditions = ['neutral', 'good']
+        subject_context = {
+            'weather': weather_conditions[0],
+            'temp': weather_conditions[1],
+        }
+        subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
+        self.assertTrue('It\'s nice out!' in subject)
+
 
 
 

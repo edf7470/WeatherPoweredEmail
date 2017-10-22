@@ -1,7 +1,15 @@
-{% if weather == "good" %}
-It's nice out! Enjoy a discount on us.
-{% elif weather == "bad" %}
+{% if weather == "bad" %}
 Not so nice out? That's okay, enjoy a discount on us.
+
+{% elif weather == "good" %}
+It's nice out! Enjoy a discount on us.
+
+{% elif temp == "bad" %}
+Not so nice out? That's okay, enjoy a discount on us.
+
+{% elif temp == "good" %}
+It's nice out! Enjoy a discount on us.
+
 {% else %}
 Enjoy a discount on us.
 {% endif %}

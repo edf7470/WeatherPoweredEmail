@@ -37,6 +37,31 @@ def simplify_api_weather(weather_api):
     return w_simple
 
 
+# Helper function to use temperature comparisons and return GOOD/BAD/NEUTRAL
+def simplify_api_temp(current_temp, current_date, location_breakdown):
+    if is_colder_than_average(current_temp, current_date, location_breakdown):
+        t_simple = BAD
+    elif is_hotter_than_average(current_temp, current_date, location_breakdown):
+        t_simple = GOOD
+    else:
+        t_simple = NEUTRAL
+    return t_simple
+
+
+# Return True if current temp is 5 or more degrees colder than the historical average temp for that date/location
+def is_colder_than_average(current_temp, current_date, location_breakdown):
+    average_temp = get_average_weather_for_date(current_date, location_breakdown)
+    temp_diff = math.fabs(current_temp - average_temp)
+    return (current_temp < average_temp) & (temp_diff >= 5)
+
+
+# Return True if current temp is 5 or more degrees hotter than the historical average temp for that date/location
+def is_hotter_than_average(current_temp, current_date, location_breakdown):
+    average_temp = get_average_weather_for_date(current_date, location_breakdown)
+    temp_diff = math.fabs(current_temp - average_temp)
+    return (current_temp > average_temp) & (temp_diff >= 5)
+
+
 # Use api_call whenever sending get request to Wunderground. Time delay included to ensure staying within limit (10 calls per minute)
 def api_call(feature, location_breakdown, extra_data):
     if feature is 'history':
@@ -49,6 +74,7 @@ def api_call(feature, location_breakdown, extra_data):
     else:
         return None
     # delay 7 seconds per API call, as to not exceed Wunderground's API call limit (10 calls per minute)
+    print('*')
     time.sleep(7)
     response_json = r.json()
     return response_json
@@ -56,9 +82,6 @@ def api_call(feature, location_breakdown, extra_data):
 
 # Make Wunderground API call to get weather conditions, check that received json data is good, return json or None
 def get_api_conditions(location_breakdown):
-    #r = requests.get('http://api.wunderground.com/api/' + settings.WUNDERGROUND_KEY +
-    #                 '/conditions/q/' + location_breakdown[0] + '/' + location_breakdown[1] + '.json')
-    #conditions_json = r.json()
     conditions_json = api_call('conditions', location_breakdown, '')
     try:
         # Check that all parts of the Subscription location's city name are part of the returned json data
@@ -128,22 +151,6 @@ def get_average_weather_for_date(date, location_breakdown):
         return average
 
 
-# Return True if current temp is 5 or more degrees colder than the historical average temp for that date/location
-def is_colder_than_average(current_temp, current_date, location_breakdown):
-    average_temp = get_average_weather_for_date(current_date, location_breakdown)
-    temp_diff = math.fabs(current_temp - average_temp)
-    print("average: " + average_temp.__str__())
-    print("temp diff: " + temp_diff.__str__())
-    return (current_temp < average_temp) & (temp_diff >= 5)
-
-
-# Return True if current temp is 5 or more degrees hotter than the historical average temp for that date/location
-def is_hotter_than_average(current_temp, current_date, location_breakdown):
-    average_temp = get_average_weather_for_date(current_date, location_breakdown)
-    temp_diff = math.fabs(current_temp - average_temp)
-    return (current_temp > average_temp) & (temp_diff >= 5)
-
-
 class Subscription(models.Model):
     email_address = models.EmailField(verbose_name="Email Address")
     location = models.CharField(max_length=20, choices=TOP_100_CITIES)
@@ -160,17 +167,19 @@ class Subscription(models.Model):
     def get_weather_conditions(self):
         conditions_json = get_api_conditions(self.get_location_breakdown())
         if conditions_json is None:
-            # fail-safe for bad json data. set weather to NEUTRAL, temperature to None
-            weather = NEUTRAL
-            temperature = None
+            # fail-safe for bad json data. set weather to NEUTRAL, temperature to NEUTRAL
+            w_simple = NEUTRAL
+            t_simple = NEUTRAL
         else:
             # find 'weather' value in json response
             weather_api = conditions_json['current_observation']['weather'].lower()
-            weather = simplify_api_weather(weather_api)
+            w_simple = simplify_api_weather(weather_api)
             # find 'temp_f' (temperature fahrenheit) value in json response
             temperature = conditions_json['current_observation']['temp_f']
+            current_date = datetime.datetime.now().date()
+            t_simple = simplify_api_temp(temperature, current_date, self.get_location_breakdown())
         # return weather (string)(GOOD/BAD/NEUTRAL) and temperature (number/None)
-        return [weather, temperature]
+        return [w_simple, t_simple]
 
 
 

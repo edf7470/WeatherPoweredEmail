@@ -66,11 +66,14 @@ class Command(BaseCommand):
             weather_conditions = sub.get_weather_conditions()
             context = {
                 'sub': sub,
-                'weather': weather_conditions,
+                'weather': weather_conditions[0],
+                'temp': weather_conditions[1],
             }
             content = render_to_string('weather/emailbody.txt', context)
+            # temp_conditions = sub.get_temp_conditions()
             subject_context = {
-                'weather': weather_conditions,
+                'weather': weather_conditions[0],
+                'temp': weather_conditions[1],
             }
             subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
             if options['print_address']:
