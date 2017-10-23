@@ -1,24 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Weather Powered Email</title>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-</head>
+{% extends './base.html' %}
+{% load static %}
 
-<body>
+{% block head %}
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'weather/style.css' %}" />
+{% endblock %}
 
-<div class="container">
-    <h2>Weather Powered Email</h2>
+
+{% block content %}
     <div class="well well-lg">
         <form action="{% url 'weather:subscribe' %}" method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="Subscribe" />
+            <input type="submit" value="Subscribe" class="button" />
         </form>
     </div>
-</div>
-
-</body>
-</html>
+{% endblock %}

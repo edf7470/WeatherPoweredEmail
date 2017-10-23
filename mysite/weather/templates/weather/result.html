@@ -1,34 +1,22 @@
+{% extends './base.html' %}
 {% load static %}
 
+{% block head %}
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 <link rel="stylesheet" type="text/css" href="{% static 'weather/style.css' %}" />
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>
-        {% if success %}
-        Success!
-
-        {% else %}
-        Try Again
-
-        {% endif %}
-
-    </title>
-</head>
-<body>
-
-{% if success %}
-<h1>Congratulations, {{ email_address }}!</h1>
-You have successfully subscribed to Weather Powered Email!<br><br>
-
-{% else %}
-<h1>Sorry!</h1>
-{{ email_address }} is already in use.<br>
-Try again with a different email address.<br><br>
-
-{% endif %}
-
-<a href="{% url 'weather:index' %}" class="button">Try Again</a>
-
-</body>
-</html>
+{% block content %}
+    <div class="well well-lg">
+    {% if success %}
+        <h3>Congratulations, {{ email_address }}!</h3>
+        You have successfully subscribed to Weather Powered Email!<br><br>
+    {% else %}
+        <h1>Sorry!</h1>
+        {{ email_address }} is already in use.<br>
+        Try again with a different email address.<br><br>
+    {% endif %}
+    <a href="{% url 'weather:index' %}" class="button">Try Again</a>
+    </div>
+{% endblock %}
