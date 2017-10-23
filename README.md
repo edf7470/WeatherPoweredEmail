@@ -2,6 +2,9 @@
 Klaviyo code challenge!
 
 ## Running the Weather App:
+Install python (3.6.3) - Download and run installer
+Install Django - **pip install Django**
+Install 'requests' - **pip install requests**
 \WeatherPoweredEmail\mysite>**python manage.py runserver**
 
 In an internet browser, enter: http://127.0.0.1:8000/weather/
