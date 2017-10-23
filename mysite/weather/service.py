@@ -3,7 +3,6 @@ import math
 import os
 import csv
 
-TRACK_API_CALLS = False
 TOP_100_CITIES = []
 
 GOOD = 'good'
@@ -32,8 +31,6 @@ def simplify_api_weather(w_value):
 
 # Helper function to use temperature comparisons and return GOOD/BAD/NEUTRAL
 def simplify_api_temp(current_temp, current_date, location_breakdown):
-    if TRACK_API_CALLS:
-        print('simplify_api_temp')
     average_temp = wundergroundhelper.service.get_average_weather_for_date(current_date, location_breakdown)
     temp_diff = math.fabs(current_temp - average_temp)
     if (current_temp < average_temp) & (temp_diff >= 5):

@@ -2,8 +2,6 @@ from mysite import settings
 import requests
 import time
 
-TRACK_API_CALLS = False
-
 
 # api_call() is the only method that sends get request to Wunderground.
 # Time delay included to ensure staying within limit
@@ -12,8 +10,6 @@ TRACK_API_CALLS = False
 #   (1000 calls per mintute - Shower key - 0.07 second delay)
 # Do not call this function directly. Use either get_api_history() or get_api_conditions()
 def api_call(feature, location_breakdown, extra_data):
-    if TRACK_API_CALLS:
-        print('api_call')
     if feature is 'history':
         yyyymmdd = extra_data
         r = requests.get('http://api.wunderground.com/api/' + settings.WUNDERGROUND_KEY +
@@ -33,8 +29,6 @@ def api_call(feature, location_breakdown, extra_data):
     else:
         # 'Developer' - free plan
         time.sleep(6.01)
-    if TRACK_API_CALLS:
-        print('*')
     response_json = r.json()
     return response_json
 
@@ -42,8 +36,6 @@ def api_call(feature, location_breakdown, extra_data):
 # Make Wunderground API call to get weather conditions, check that received json data is good, return json or None
 # Uses api_call()
 def get_api_conditions(location_breakdown):
-    if TRACK_API_CALLS:
-        print('get_api_conditions')
     conditions_json = api_call('conditions', location_breakdown, '')
     try:
         # Check that all parts of the Subscription location's city name are part of the returned json data
@@ -61,8 +53,6 @@ def get_api_conditions(location_breakdown):
 # Make Wunderground API call to get weather history, check that received json data is good, return json or None
 # Uses api_call()
 def get_api_history(yyyymmdd, location_breakdown):
-    if TRACK_API_CALLS:
-        print('get_api_history')
     # check that input is formatted correctly. If not, return None
     if len(yyyymmdd) != 8:
         return None
@@ -80,8 +70,6 @@ def get_api_history(yyyymmdd, location_breakdown):
 # Returns the average temperature (imperial) for the given date and location over the past 5 years (if accessible), else return None
 # Makes ~5 API calls, so execution can be time consuming. Minimize use of this function whenever possible.
 def get_average_weather_for_date(date, location_breakdown):
-    if TRACK_API_CALLS:
-        print('get_average_weather_for_date')
     year = date.year
     month = date.month
     day = date.day
