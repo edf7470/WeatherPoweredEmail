@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.template.loader import render_to_string
 from weather.service import GOOD, BAD, NEUTRAL, simplify_api_weather, simplify_api_temp
-from weather import models
 from .models import Subscription
 import datetime
 import weather.service
@@ -68,7 +67,7 @@ class SubscriptionModelTests(TestCase):
         sub = Subscription(email_address='somethingM@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
         t_simple = simplify_api_temp(current_temp, current_date, location_breakdown)
-        self.assertEqual(t_simple, weather.service.BAD)
+        self.assertEqual(t_simple, BAD)
 
     def test_simplify_api_temp_good(self):
         current_temp = 100
@@ -76,11 +75,11 @@ class SubscriptionModelTests(TestCase):
         sub = Subscription(email_address='somethingN@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
         t_simple = simplify_api_temp(current_temp, current_date, location_breakdown)
-        self.assertEqual(t_simple, weather.service.GOOD)
+        self.assertEqual(t_simple, GOOD)
 
     # Test emailsubject.txt
     def test_emailsubject_txt_bad_bad(self):
-        weather_conditions = [weather.service.BAD, weather.service.BAD]
+        weather_conditions = [BAD, BAD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -89,7 +88,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_bad_good(self):
-        weather_conditions = [weather.service.BAD, weather.service.GOOD]
+        weather_conditions = [BAD, GOOD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -98,7 +97,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_bad_neutral(self):
-        weather_conditions = [weather.service.BAD, weather.service.NEUTRAL]
+        weather_conditions = [BAD, NEUTRAL]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -107,7 +106,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_good_good(self):
-        weather_conditions = [weather.service.GOOD, weather.service.GOOD]
+        weather_conditions = [GOOD, GOOD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -116,7 +115,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('It\'s nice out!' in subject)
 
     def test_emailsubject_txt_good_bad(self):
-        weather_conditions = [weather.service.GOOD, weather.service.BAD]
+        weather_conditions = [GOOD, BAD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -126,7 +125,7 @@ class SubscriptionModelTests(TestCase):
 
 
     def test_emailsubject_txt_good_neutral(self):
-        weather_conditions = [weather.service.GOOD, weather.service.NEUTRAL]
+        weather_conditions = [GOOD, NEUTRAL]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -135,7 +134,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('It\'s nice out!' in subject)
 
     def test_emailsubject_txt_neutral_neutral(self):
-        weather_conditions = [weather.service.NEUTRAL, weather.service.NEUTRAL]
+        weather_conditions = [NEUTRAL, NEUTRAL]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -145,7 +144,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('It\'s nice out!' not in subject)
 
     def test_emailsubject_txt_neutral_bad(self):
-        weather_conditions = [weather.service.NEUTRAL, weather.service.BAD]
+        weather_conditions = [NEUTRAL, BAD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -154,7 +153,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_neutral_good(self):
-        weather_conditions = [weather.service.NEUTRAL, weather.service.GOOD]
+        weather_conditions = [NEUTRAL, GOOD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],

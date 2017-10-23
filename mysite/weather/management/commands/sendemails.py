@@ -2,8 +2,7 @@ from django.core.management.base import BaseCommand
 from django.core.mail import send_mass_mail
 from django.template.loader import render_to_string
 from weather.models import Subscription
-import weather.service
-import weather
+from weather import service
 
 
 class Command(BaseCommand):
@@ -66,7 +65,7 @@ class Command(BaseCommand):
         # Loop for each Subscription (query for weather data, build email, print data)
         for sub in subs:
             weather_conditions = sub.get_weather_conditions()
-            city_dictionary = dict(weather.service.get_choices_array())
+            city_dictionary = dict(service.get_choices_array())
             city_readable = city_dictionary[sub.location].split('-')[1].strip()
             context = {
                 'sub': sub,
