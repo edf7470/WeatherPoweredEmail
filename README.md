@@ -36,7 +36,13 @@ To generate and view newsletters for subscribers, but don't send the emails out:
 
 \WeatherPoweredEmail\mysite>**python manage.py sendemails --no_send --print_all**
 
-## Good vs Bad Weather Logic:
+## Weather App Automated Tests:
+To run the Weather app automated test suite (It will take a few minutes to complete), execute the command:
+\WeatherPoweredEmail\mysite>**python manage.py test weather**
+
+\WeatherPoweredEmail\mysite>**python manage.py test wundergroundhelper**
+
+## Good Weather vs Bad Weather Logic:
 Looking at emailbody.txt, I decided that the weather conditions (rainy/snowy/sunny) were more 
 important than the temperature difference, in regards to the decision about how nice the day is. 
 
@@ -54,11 +60,6 @@ Given these circumstances, 5 degrees warmer than the average would be considered
 The weather values receivable from Wunderground API which constitute "percipitating" include: 'rain', 'light rain', 'sleet', 'snow'. 
 Any other values which should be calssified as "bad weather" can be added to the weather_simple dictionary, linked to the value BAD.
 
-## Weather App Automated Tests:
-To run the Weather app automated test suite (It will take a few minutes to complete), execute the command:
-\WeatherPoweredEmail\mysite>**python manage.py test weather**
-
-\WeatherPoweredEmail\mysite>**python manage.py test wundergroundhelper**
 
 
 
