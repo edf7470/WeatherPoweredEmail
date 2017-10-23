@@ -1,11 +1,8 @@
-from django.utils import timezone
 from django.test import TestCase
+from django.template.loader import render_to_string
 from weather import models
 from .models import Subscription
 import datetime
-import time
-
-from django.template.loader import render_to_string
 
 
 class SubscriptionModelTests(TestCase):

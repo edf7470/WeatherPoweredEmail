@@ -1,8 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
-from weather.models import Subscription
+from django.core.management.base import BaseCommand
 from django.core.mail import send_mass_mail
 from django.template.loader import render_to_string
-import json
+from weather.models import Subscription
 import weather
 
 

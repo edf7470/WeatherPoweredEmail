@@ -6,14 +6,9 @@ import time
 import math
 import csv
 import os
-from . import static
-# from django.static.loader import render_to_string
-from django.contrib.staticfiles import finders
-from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 TRACK_API_CALLS = False
-
 
 
 GOOD = 'good'
