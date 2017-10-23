@@ -3,7 +3,6 @@ from django.template.loader import render_to_string
 from weather.service import GOOD, BAD, NEUTRAL, simplify_api_weather, simplify_api_temp
 from .models import Subscription
 import datetime
-import weather.service
 import wundergroundhelper.service
 
 
@@ -25,8 +24,6 @@ class SubscriptionModelTests(TestCase):
         location_breakdown = sub.get_location_breakdown()
         expected = ['IL','Chicago']
         self.assertListEqual(location_breakdown, expected, "Good location data should return a list: ['IL', 'Chicago']")
-
-
 
     # Test Subscription.get_weather_conditions()
     def test_get_weather_conditions(self):
@@ -64,16 +61,14 @@ class SubscriptionModelTests(TestCase):
     def test_simplify_api_temp_bad(self):
         current_temp = 10
         current_date = datetime.date(2016, 7, 1)
-        sub = Subscription(email_address='somethingM@gmail.com', location='NY,New_York')
-        location_breakdown = sub.get_location_breakdown()
+        location_breakdown = ['NY','New_York']
         t_simple = simplify_api_temp(current_temp, current_date, location_breakdown)
         self.assertEqual(t_simple, BAD)
 
     def test_simplify_api_temp_good(self):
         current_temp = 100
         current_date = datetime.date(2016, 1, 1)
-        sub = Subscription(email_address='somethingN@gmail.com', location='NY,New_York')
-        location_breakdown = sub.get_location_breakdown()
+        location_breakdown = ['NY','New_York']
         t_simple = simplify_api_temp(current_temp, current_date, location_breakdown)
         self.assertEqual(t_simple, GOOD)
 

@@ -22,6 +22,20 @@ time between API calls, edit the settings.py values WUNDERGROUND_KEY with your (
 the plan level (Developer, Drizzle, Shower, Downpour). If the WUNDERGROUND_KEY_LEVEL is set to a 'higher' level than the KEY actually represents, 
 the account will be locked temporarily and API calls will not receive proper responses. Use caution when editing these settings values. 
 
+## Django Management Command:
+To generate newsletters and send them out as emails:
+
+\WeatherPoweredEmail\mysite>**python manage.py sendemails**
+
+To generate newsletters and send them out as emails, with data printed, choose any combination 
+of the 'print' options (--print_all includes address, weather, newsletter:
+
+\WeatherPoweredEmail\mysite>**python manage.py sendemails [--print_address] [--print_weather] [--print_newsletter] [--print_all]**
+ 
+To generate and view newsletters for subscribers, but don't send the emails out:
+
+\WeatherPoweredEmail\mysite>**python manage.py sendemails --no_send --print_all**
+
 ## Good vs Bad Weather Logic:
 Looking at emailbody.txt, I decided that the weather conditions (rainy/snowy/sunny) were more 
 important than the temperature difference, in regards to the decision about how nice the day is. 
@@ -46,19 +60,6 @@ To run the Weather app automated test suite (It will take a few minutes to compl
 
 \WeatherPoweredEmail\mysite>**python manage.py test wundergroundhelper**
 
-## Django Management Command:
-To generate newsletters and send them out as emails:
-
-\WeatherPoweredEmail\mysite>**python manage.py sendemails**
-
-To generate newsletters and send them out as emails, with data printed, choose any combination 
-of the 'print' options (--print_all includes address, weather, newsletter:
-
-\WeatherPoweredEmail\mysite>**python manage.py sendemails [--print_address] [--print_weather] [--print_newsletter] [--print_all]**
- 
-To generate and view newsletters for subscribers, but don't send the emails out:
-
-\WeatherPoweredEmail\mysite>**python manage.py sendemails --no_send --print_all**
 
 
 
