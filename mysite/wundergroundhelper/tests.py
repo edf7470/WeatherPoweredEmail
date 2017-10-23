@@ -3,11 +3,8 @@ from weather.models import Subscription
 from wundergroundhelper import service
 import datetime
 
-# Create your tests here.
 
 class WundergroundHelperServiceTests(TestCase):
-
-    # Test api_call()
 
     # Test get_api_conditions()
     def test_get_api_conditions_good_input(self):

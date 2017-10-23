@@ -3,6 +3,7 @@ from .models import Subscription
 from . import models
 from weather.service import get_choices_array
 
+
 # User can subscribe for Weather-Powered-Email by providing email address and location to the "Subscription Form"
 class SubscriptionForm(forms.ModelForm):
 
@@ -33,6 +34,5 @@ class SubscriptionForm(forms.ModelForm):
             # Unable to find a user, this is fine
             return email_address
 
-        print("Email address is already in use! - Validation ERROR")
         # A user was found with this as a username, raise an error.
         raise forms.ValidationError('This email address is already in use.')
