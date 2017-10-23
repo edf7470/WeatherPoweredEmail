@@ -70,8 +70,8 @@ class SubscriptionModelTests(TestCase):
         c_json = models.get_api_conditions(sub.get_location_breakdown())
         if c_json is None:
             # fail-safe for bad json data. set weather to NEUTRAL, temperature to None
-            weather = 'neutral'
-            temperature = None
+            w_simple = 'neutral'
+            t_simple = None
         else:
             # find 'weather' value in json response
             weather_api = c_json['current_observation']['weather'].lower()
@@ -126,39 +126,22 @@ class SubscriptionModelTests(TestCase):
         expected = None;
         self.assertEqual(tested, expected, "Average temperature not correctly calculated.")
 
-    # Test is_colder_than_average()
-    def test_is_colder_than_average_true(self):
+    # Test simplify_api_temp()
+    def test_simplify_api_temp_bad(self):
         current_temp = 10
         current_date = datetime.date(2016, 7, 1)
         sub = Subscription(email_address='somethingM@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
-        is_colder = models.is_colder_than_average(current_temp, current_date, location_breakdown)
-        self.assertTrue(is_colder)
+        t_simple = models.simplify_api_temp(current_temp, current_date, location_breakdown)
+        self.assertEqual(t_simple, 'bad')
 
-    def test_is_colder_than_average_false(self):
+    def test_simplify_api_temp_good(self):
         current_temp = 100
         current_date = datetime.date(2016, 1, 1)
         sub = Subscription(email_address='somethingN@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
-        is_colder = models.is_colder_than_average(current_temp, current_date, location_breakdown)
-        self.assertFalse(is_colder)
-
-    # Test is_hotter_than_average()
-    def test_is_hotter_than_average_true(self):
-        current_temp = 100
-        current_date = datetime.date(2016, 1, 1)
-        sub = Subscription(email_address='somethingO@gmail.com', location='NY,New_York')
-        location_breakdown = sub.get_location_breakdown()
-        is_hotter = models.is_hotter_than_average(current_temp, current_date, location_breakdown)
-        self.assertTrue(is_hotter)
-
-    def test_is_hotter_than_average_false(self):
-        current_temp = 10
-        current_date = datetime.date(2016, 7, 1)
-        sub = Subscription(email_address='somethingP@gmail.com', location='NY,New_York')
-        location_breakdown = sub.get_location_breakdown()
-        is_hotter = models.is_hotter_than_average(current_temp, current_date, location_breakdown)
-        self.assertFalse(is_hotter)
+        t_simple = models.simplify_api_temp(current_temp, current_date, location_breakdown)
+        self.assertEqual(t_simple, 'good')
 
     # Test emailsubject.txt
     def test_emailsubject_txt_bad_bad(self):

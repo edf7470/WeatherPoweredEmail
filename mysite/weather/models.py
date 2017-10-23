@@ -6,6 +6,8 @@ import time
 import math
 
 
+TRACK_API_CALLS = False
+
 # Array of tuples lists the "Location" options
 TOP_100_CITIES = (
     ("NY,New_York", 'New York, NY'),
@@ -38,32 +40,53 @@ def simplify_api_weather(weather_api):
 
 
 # Helper function to use temperature comparisons and return GOOD/BAD/NEUTRAL
+#def simplify_api_temp(current_temp, current_date, location_breakdown):
+#    print('simplify_api_temp')
+#    if is_colder_than_average(current_temp, current_date, location_breakdown):
+#        t_simple = BAD
+#    elif is_hotter_than_average(current_temp, current_date, location_breakdown):
+#        t_simple = GOOD
+#    else:
+#        t_simple = NEUTRAL
+#    return t_simple
+
+
+# Helper function to use temperature comparisons and return GOOD/BAD/NEUTRAL
 def simplify_api_temp(current_temp, current_date, location_breakdown):
-    if is_colder_than_average(current_temp, current_date, location_breakdown):
-        t_simple = BAD
-    elif is_hotter_than_average(current_temp, current_date, location_breakdown):
-        t_simple = GOOD
+    if TRACK_API_CALLS:
+        print('simplify_api_temp')
+    average_temp = get_average_weather_for_date(current_date, location_breakdown)
+    temp_diff = math.fabs(current_temp - average_temp)
+    if (current_temp < average_temp) & (temp_diff >= 5):
+        # temperature is colder than average, return BAD
+        return BAD
+    elif (current_temp > average_temp) & (temp_diff >= 5):
+        # temperature is hotter than average, return GOOD
+        return GOOD
     else:
-        t_simple = NEUTRAL
-    return t_simple
+        return NEUTRAL
 
 
 # Return True if current temp is 5 or more degrees colder than the historical average temp for that date/location
-def is_colder_than_average(current_temp, current_date, location_breakdown):
-    average_temp = get_average_weather_for_date(current_date, location_breakdown)
-    temp_diff = math.fabs(current_temp - average_temp)
-    return (current_temp < average_temp) & (temp_diff >= 5)
+#def is_colder_than_average(current_temp, current_date, location_breakdown):
+#    print('is_colder_than_average')
+#    average_temp = get_average_weather_for_date(current_date, location_breakdown)
+#    temp_diff = math.fabs(current_temp - average_temp)
+#    return (current_temp < average_temp) & (temp_diff >= 5)
 
 
 # Return True if current temp is 5 or more degrees hotter than the historical average temp for that date/location
-def is_hotter_than_average(current_temp, current_date, location_breakdown):
-    average_temp = get_average_weather_for_date(current_date, location_breakdown)
-    temp_diff = math.fabs(current_temp - average_temp)
-    return (current_temp > average_temp) & (temp_diff >= 5)
+#def is_hotter_than_average(current_temp, current_date, location_breakdown):
+#    print('is_hotter_than_average')
+#    average_temp = get_average_weather_for_date(current_date, location_breakdown)
+#    temp_diff = math.fabs(current_temp - average_temp)
+#    return (current_temp > average_temp) & (temp_diff >= 5)
 
 
 # Use api_call whenever sending get request to Wunderground. Time delay included to ensure staying within limit (10 calls per minute)
 def api_call(feature, location_breakdown, extra_data):
+    if TRACK_API_CALLS:
+        print('api_call')
     if feature is 'history':
         yyyymmdd = extra_data
         r = requests.get('http://api.wunderground.com/api/' + settings.WUNDERGROUND_HISTORY_KEY +
@@ -74,14 +97,17 @@ def api_call(feature, location_breakdown, extra_data):
     else:
         return None
     # delay 7 seconds per API call, as to not exceed Wunderground's API call limit (10 calls per minute)
-    print('*')
     time.sleep(7)
+    if TRACK_API_CALLS:
+        print('*')
     response_json = r.json()
     return response_json
 
 
 # Make Wunderground API call to get weather conditions, check that received json data is good, return json or None
 def get_api_conditions(location_breakdown):
+    if TRACK_API_CALLS:
+        print('get_api_conditions')
     conditions_json = api_call('conditions', location_breakdown, '')
     try:
         # Check that all parts of the Subscription location's city name are part of the returned json data
@@ -98,6 +124,8 @@ def get_api_conditions(location_breakdown):
 
 # Make Wunderground API call to get weather history, check that received json data is good, return json or None
 def get_api_history(yyyymmdd, location_breakdown):
+    if TRACK_API_CALLS:
+        print('get_api_history')
     # check that input is formatted correctly. If not, return None
     if len(yyyymmdd) != 8:
         return None
@@ -114,6 +142,8 @@ def get_api_history(yyyymmdd, location_breakdown):
 
 # Returns the average temperature (imperial) for the given date and location over the past 5 years (if accessible), else return None
 def get_average_weather_for_date(date, location_breakdown):
+    if TRACK_API_CALLS:
+        print('get_average_weather_for_date')
     year = date.year
     month = date.month
     day = date.day
@@ -165,6 +195,8 @@ class Subscription(models.Model):
         return [state,city]
 
     def get_weather_conditions(self):
+        if TRACK_API_CALLS:
+            print('get_weather_conditions')
         conditions_json = get_api_conditions(self.get_location_breakdown())
         if conditions_json is None:
             # fail-safe for bad json data. set weather to NEUTRAL, temperature to NEUTRAL
