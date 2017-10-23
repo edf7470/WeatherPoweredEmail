@@ -57,7 +57,7 @@ preference, and/or seasonal circumstances.
 
 Given these circumstances, 5 degrees warmer than the average would be considered a "good weather day" in the winter, but a "bad weather day" in the summer.
 
-The weather values receivable from Wunderground API which constitute "percipitating" include: 'rain', 'light rain', 'sleet', 'snow'. 
+The weather values receivable from Wunderground API which constitute "percipitating" (as called for in the Spec) include: 'rain', 'light rain', 'sleet', 'snow'. 
 Any other values which should be calssified as "bad weather" can be added to the weather_simple dictionary, linked to the value BAD.
 
 

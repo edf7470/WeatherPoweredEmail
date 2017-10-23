@@ -26,36 +26,11 @@ class SubscriptionModelTests(TestCase):
         self.assertListEqual(location_breakdown, expected, "Good location data should return a list: ['IL', 'Chicago']")
 
     # Test Subscription.get_weather_conditions()
-    def test_get_weather_conditions(self):
-        # tested
-        sub = Subscription(email_address='somethingG@gmail.com', location='NY,New_York')
-        test_weather_conditions = sub.get_weather_conditions()
-        # expected
-        c_json = wundergroundhelper.service.get_api_conditions(sub.get_location_breakdown())
-        if c_json is None:
-            # fail-safe for bad json data. set weather to NEUTRAL, temperature to None
-            w_simple = NEUTRAL
-            t_simple = None
-        else:
-            # find 'weather' value in json response
-            weather_api = c_json['current_observation']['weather'].lower()
-            w_simple = simplify_api_weather(weather_api)
-            # find 'temp_f' (temperature fahrenheit) value in json response
-            temperature = c_json['current_observation']['temp_f']
-            current_date = datetime.datetime.now().date()
-            t_simple = simplify_api_temp(temperature, current_date, sub.get_location_breakdown())
-        expected = [w_simple, t_simple, weather_api, temperature]
-        self.assertAlmostEqual(test_weather_conditions[3],expected[3],delta=1)
-        self.assertEqual(test_weather_conditions[0], expected[0])
-        self.assertEqual(test_weather_conditions[1], expected[1])
-        self.assertEqual(test_weather_conditions[2], expected[2])
-
     def test_get_weather_conditions_bad_state_input(self):
         sub = Subscription(email_address='somethingH@gmail.com', location='XX,New_York')
         weather_conditions = sub.get_weather_conditions()
         expected = [NEUTRAL, NEUTRAL, None, None]
         self.assertListEqual(weather_conditions, expected, "Bad location input should return a list: ['neutral', 'neutral', None, None]")
-
 
     # Test simplify_api_temp()
     def test_simplify_api_temp_bad(self):
