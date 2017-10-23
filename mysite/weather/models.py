@@ -4,17 +4,17 @@ import requests
 import datetime
 import time
 import math
+import csv
+import os
+from . import static
+# from django.static.loader import render_to_string
+from django.contrib.staticfiles import finders
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 TRACK_API_CALLS = False
 
-# Array of tuples lists the "Location" options
-TOP_100_CITIES = (
-    ("NY,New_York", 'New York, NY'),
-    ("IL,Chicago", 'Chicago, IL'),
-    ("TX,Dallas", 'Dallas, TX'),
-    ("CA,Los_Angeles", 'Los Angeles, CA'),
-)
+
 
 GOOD = 'good'
 BAD = 'bad'
@@ -40,18 +40,6 @@ def simplify_api_weather(weather_api):
 
 
 # Helper function to use temperature comparisons and return GOOD/BAD/NEUTRAL
-#def simplify_api_temp(current_temp, current_date, location_breakdown):
-#    print('simplify_api_temp')
-#    if is_colder_than_average(current_temp, current_date, location_breakdown):
-#        t_simple = BAD
-#    elif is_hotter_than_average(current_temp, current_date, location_breakdown):
-#        t_simple = GOOD
-#    else:
-#        t_simple = NEUTRAL
-#    return t_simple
-
-
-# Helper function to use temperature comparisons and return GOOD/BAD/NEUTRAL
 def simplify_api_temp(current_temp, current_date, location_breakdown):
     if TRACK_API_CALLS:
         print('simplify_api_temp')
@@ -65,22 +53,6 @@ def simplify_api_temp(current_temp, current_date, location_breakdown):
         return GOOD
     else:
         return NEUTRAL
-
-
-# Return True if current temp is 5 or more degrees colder than the historical average temp for that date/location
-#def is_colder_than_average(current_temp, current_date, location_breakdown):
-#    print('is_colder_than_average')
-#    average_temp = get_average_weather_for_date(current_date, location_breakdown)
-#    temp_diff = math.fabs(current_temp - average_temp)
-#    return (current_temp < average_temp) & (temp_diff >= 5)
-
-
-# Return True if current temp is 5 or more degrees hotter than the historical average temp for that date/location
-#def is_hotter_than_average(current_temp, current_date, location_breakdown):
-#    print('is_hotter_than_average')
-#    average_temp = get_average_weather_for_date(current_date, location_breakdown)
-#    temp_diff = math.fabs(current_temp - average_temp)
-#    return (current_temp > average_temp) & (temp_diff >= 5)
 
 
 # Use api_call whenever sending get request to Wunderground. Time delay included to ensure staying within limit (10 calls per minute)
@@ -181,9 +153,29 @@ def get_average_weather_for_date(date, location_breakdown):
         return average
 
 
+TOP_100_CITIES = []
+
+
+def get_choices_array():
+    if len(TOP_100_CITIES) > 1:
+        return tuple(TOP_100_CITIES)
+    else:
+        print("Remaking Top Cities List")
+        # generate list to convert to tuple
+        TOP_100_CITIES.clear()
+        TOP_100_CITIES.append(('', 'Where do you live?'))
+        with open(os.path.expanduser(r'C:\Users\filme\PycharmProjects\WeatherPoweredEmail\mysite\weather\static\weather\cities.csv'), 'r') as cities_file:
+        #with open(os.path.abspath(r'\mysite\weather\static\weather\cities.csv'), 'r') as cities_file:
+            reader = csv.reader(cities_file)
+            for row in reader:
+                new_item = (row[0]+','+row[1], row[3]+' - '+row[2])
+                TOP_100_CITIES.append(new_item)
+        return tuple(TOP_100_CITIES)
+
+
 class Subscription(models.Model):
     email_address = models.EmailField(verbose_name="Email Address")
-    location = models.CharField(max_length=20, choices=TOP_100_CITIES)
+    location = models.CharField(max_length=20, choices=get_choices_array())
 
     def __str__(self):
         return self.email_address
