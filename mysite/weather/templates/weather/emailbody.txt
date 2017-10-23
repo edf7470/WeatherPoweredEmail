@@ -1,8 +1,6 @@
 Hello {{ sub.email_address }},
 
-Temperature: {{ t_value }} F
-
-Conditions: {{ w_value }}
+{{ t_value }} degrees, {{ w_value }}
 {% if weather == "bad" %}
 Not so nice out today in {{ city_readable }}?
 
