@@ -62,6 +62,7 @@ class Command(BaseCommand):
             self.stdout.write('----------------------------------')
         i = 0
         subs = Subscription.objects.all()
+        # Loop for each Subscription (query for weather data, build email, print data)
         for sub in subs:
             weather_conditions = sub.get_weather_conditions()
             city_dictionary = dict(weather.models.get_choices_array())
@@ -71,30 +72,27 @@ class Command(BaseCommand):
                 'weather': weather_conditions[0],
                 'temp': weather_conditions[1],
                 'city_readable': city_readable,
+                'w_value': weather_conditions[2],
+                't_value': weather_conditions[3],
             }
             content = render_to_string('weather/emailbody.txt', context)
-            # temp_conditions = sub.get_temp_conditions()
             subject_context = {
                 'weather': weather_conditions[0],
                 'temp': weather_conditions[1],
             }
             subject = render_to_string('weather/emailsubject.txt', subject_context).strip()
             if options['print_address']:
-                # email address
                 self.stdout.write('Email Address: ' + sub.email_address)
             if options['print_weather']:
-                # weather
-                self.stdout.write('Weather: ' + weather_conditions[0])
-                self.stdout.write('Temperature: ' + weather_conditions[1].__str__())
+                self.stdout.write('Weather: ' + weather_conditions[0] + ' : ' + weather_conditions[2])
+                self.stdout.write('Temperature: ' + weather_conditions[1].__str__() + ' : ' + weather_conditions[3].__str__())
             if options['print_newsletter']:
-                # Newsletter
                 self.stdout.write('Newsletter:')
                 self.stdout.write('Content:')
                 self.stdout.write(content)
                 self.stdout.write('Subject:')
                 self.stdout.write(subject)
             if not options['no_send']:
-                # send email
                 from_address = 'weatherDeals@test.com'
                 to_addresses = [sub.email_address]
                 message = (subject, content, from_address, to_addresses)

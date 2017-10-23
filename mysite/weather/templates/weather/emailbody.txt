@@ -1,17 +1,26 @@
 Hello {{ sub.email_address }},
+
+Temperature: {{ t_value }} F
+
+Conditions: {{ w_value }}
 {% if weather == "bad" %}
-Not so nice out today in {{ city_readable }}? That's okay, enjoy a discount on us.
+Not so nice out today in {{ city_readable }}?
 
+That's okay, enjoy a discount on us.
 {% elif weather == "good" %}
-It's nice out today in {{ city_readable }}! Enjoy a discount on us.
+It's nice out today in {{ city_readable }}!
 
+Enjoy a discount on us.
 {% elif temp == "bad" %}
-Not so nice out today in {{ city_readable }}? That's okay, enjoy a discount on us.
+Not so nice out today in {{ city_readable }}?
 
+That's okay, enjoy a discount on us.
 {% elif temp == "good" %}
-It's nice out today in {{ city_readable }}! Enjoy a discount on us.
+It's nice out today in {{ city_readable }}!
 
+Enjoy a discount on us.
 {% else %}
 {{ city_readable }} is calling!
+
 Enjoy a discount on us.
 {% endif %}

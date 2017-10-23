@@ -77,15 +77,17 @@ class SubscriptionModelTests(TestCase):
             temperature = c_json['current_observation']['temp_f']
             current_date = datetime.datetime.now().date()
             t_simple = models.simplify_api_temp(temperature, current_date, sub.get_location_breakdown())
-        expected = [w_simple, t_simple]
-        self.assertAlmostEqual(test_weather_conditions[1],expected[1],delta=1)
+        expected = [w_simple, t_simple, weather_api, temperature]
+        self.assertAlmostEqual(test_weather_conditions[3],expected[3],delta=1)
         self.assertEqual(test_weather_conditions[0], expected[0])
+        self.assertEqual(test_weather_conditions[1], expected[1])
+        self.assertEqual(test_weather_conditions[2], expected[2])
 
     def test_get_weather_conditions_bad_state_input(self):
         sub = Subscription(email_address='somethingH@gmail.com', location='XX,New_York')
         weather_conditions = sub.get_weather_conditions()
-        expected = ['neutral', 'neutral']
-        self.assertListEqual(weather_conditions, expected, "Bad location input should return a list: ['neutral', 'neutral']")
+        expected = ['neutral', 'neutral', None, None]
+        self.assertListEqual(weather_conditions, expected, "Bad location input should return a list: ['neutral', 'neutral', None, None]")
 
     # Test get_api_history()
     # history - 1

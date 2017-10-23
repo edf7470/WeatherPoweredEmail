@@ -19,15 +19,16 @@ NEUTRAL = 'neutral'
 weather_simple = {
     'sleet': BAD,
     'rain': BAD,
+    'light rain': BAD,
     'snow': BAD,
     'sunny': GOOD,
 }
 
 
 # Helper function to catch weather conditions not included in the weather_simple Dictionary, and set to NEUTRAL.
-def simplify_api_weather(weather_api):
+def simplify_api_weather(w_value):
     # Get simplified version from Dictionary
-    w_simple = weather_simple.get(weather_api)
+    w_simple = weather_simple.get(w_value)
     # If weather condition wasn't included in Dictionary, set to NEUTRAL
     if w_simple is None:
         w_simple = NEUTRAL
@@ -185,19 +186,21 @@ class Subscription(models.Model):
             print('get_weather_conditions')
         conditions_json = get_api_conditions(self.get_location_breakdown())
         if conditions_json is None:
-            # fail-safe for bad json data. set weather to NEUTRAL, temperature to NEUTRAL
+            # fail-safe for bad json data. set weather & temp (simple) to NEUTRAL, weather & temp (value) to None
             w_simple = NEUTRAL
             t_simple = NEUTRAL
+            w_value = None
+            t_value = None
         else:
             # find 'weather' value in json response
-            weather_api = conditions_json['current_observation']['weather'].lower()
-            w_simple = simplify_api_weather(weather_api)
+            w_value = conditions_json['current_observation']['weather'].lower()
+            w_simple = simplify_api_weather(w_value)
             # find 'temp_f' (temperature fahrenheit) value in json response
-            temperature = conditions_json['current_observation']['temp_f']
+            t_value = conditions_json['current_observation']['temp_f']
             current_date = datetime.datetime.now().date()
-            t_simple = simplify_api_temp(temperature, current_date, self.get_location_breakdown())
+            t_simple = simplify_api_temp(t_value, current_date, self.get_location_breakdown())
         # return weather (string)(GOOD/BAD/NEUTRAL) and temperature (number/None)
-        return [w_simple, t_simple]
+        return [w_simple, t_simple, w_value, t_value]
 
 
 
