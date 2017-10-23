@@ -7,24 +7,32 @@ TRACK_API_CALLS = False
 
 # api_call() is the only method that sends get request to Wunderground.
 # Time delay included to ensure staying within limit
-#   (10 calls per minute - DEVELOPER key - 6.01 second delay)
-#   (100 calls per minute - DRIZZLE key - .61 second delay)
-#   (1000 calls per mintute - DOWNPOUR key - .07 second delay)
+#   (10 calls per minute - Developer key - 6.01 second delay)
+#   (100 calls per minute - Drizzle key - 0.61 second delay)
+#   (1000 calls per mintute - Shower key - 0.07 second delay)
 # Do not call this function directly. Use either get_api_history() or get_api_conditions()
 def api_call(feature, location_breakdown, extra_data):
     if TRACK_API_CALLS:
         print('api_call')
     if feature is 'history':
         yyyymmdd = extra_data
-        r = requests.get('http://api.wunderground.com/api/' + settings.WUNDERGROUND_HISTORY_KEY +
+        r = requests.get('http://api.wunderground.com/api/' + settings.WUNDERGROUND_KEY +
                      '/history_' + yyyymmdd + '/q/' + location_breakdown[0] + '/' + location_breakdown[1] + '.json')
     elif feature is 'conditions':
         r = requests.get('http://api.wunderground.com/api/' + settings.WUNDERGROUND_KEY +
                      '/conditions/q/' + location_breakdown[0] + '/' + location_breakdown[1] + '.json')
     else:
         return None
-    # delay 6.01 seconds per API call, as to not exceed Wunderground's API call limit (10 calls per minute)
-    time.sleep(6.01)
+    # delay per API call, as to not exceed Wunderground's API call limit per minute
+    if settings.WUNDERGROUND_KEY_LEVEL == 'Downpour':
+        time.sleep(0.01)
+    if settings.WUNDERGROUND_KEY_LEVEL == 'Shower':
+        time.sleep(0.07)
+    elif settings.WUNDERGROUND_KEY_LEVEL == 'Drizzle':
+        time.sleep(0.61)
+    else:
+        # 'Developer' - free plan
+        time.sleep(6.01)
     if TRACK_API_CALLS:
         print('*')
     response_json = r.json()

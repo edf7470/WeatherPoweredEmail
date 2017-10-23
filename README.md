@@ -18,7 +18,9 @@ the application calls 'sleep' for 7 seconds after each API call as to not exceed
 This is why the weather app is so slow. 
 
 To upgrade the application to use a better Wunderground key, and allow for less waiting 
-time between API calls, edit the settings.py value WUNDERGROUND_KEY
+time between API calls, edit the settings.py values WUNDERGROUND_KEY with your (paid) key, and WUNDERGROUND_KEY_LEVEL with 
+the plan level (Developer, Drizzle, Shower, Downpour). If the WUNDERGROUND_KEY_LEVEL is set to a 'higher' level than the KEY actually represents, 
+the account will be locked temporarily and API calls will not receive proper responses. Use caution when editing these settings values. 
 
 ## Good vs Bad Weather Logic:
 Looking at emailbody.txt, I decided that the weather conditions (rainy/snowy/sunny) were more 
