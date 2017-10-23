@@ -160,12 +160,10 @@ def get_choices_array():
     if len(TOP_100_CITIES) > 1:
         return tuple(TOP_100_CITIES)
     else:
-        print("Remaking Top Cities List")
         # generate list to convert to tuple
         TOP_100_CITIES.clear()
         TOP_100_CITIES.append(('', 'Where do you live?'))
         full_path = os.path.dirname(os.path.realpath(__file__)) + '\static\weather\cities.csv'
-        print(full_path)
         with open(os.path.abspath(full_path), 'r') as cities_file:
             reader = csv.reader(cities_file)
             for row in reader:

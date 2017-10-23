@@ -3,6 +3,7 @@ from weather.models import Subscription
 from django.core.mail import send_mass_mail
 from django.template.loader import render_to_string
 import json
+import weather
 
 
 class Command(BaseCommand):
@@ -64,10 +65,13 @@ class Command(BaseCommand):
         subs = Subscription.objects.all()
         for sub in subs:
             weather_conditions = sub.get_weather_conditions()
+            city_dictionary = dict(weather.models.get_choices_array())
+            city_readable = city_dictionary[sub.location].split('-')[1].strip()
             context = {
                 'sub': sub,
                 'weather': weather_conditions[0],
                 'temp': weather_conditions[1],
+                'city_readable': city_readable,
             }
             content = render_to_string('weather/emailbody.txt', context)
             # temp_conditions = sub.get_temp_conditions()
