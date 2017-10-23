@@ -1,11 +1,12 @@
 from django import forms
 from .models import Subscription
 from . import models
+from weather.service import get_choices_array
 
 # User can subscribe for Weather-Powered-Email by providing email address and location to the "Subscription Form"
 class SubscriptionForm(forms.ModelForm):
 
-    location = forms.ChoiceField(choices=models.get_choices_array(), label="Location",initial='Where do you live?',widget=forms.Select(),required=True)
+    location = forms.ChoiceField(choices=get_choices_array(), label="Location",initial='Where do you live?',widget=forms.Select(),required=True)
 
     # Meta class describes the input form based on the model object 'Subscription' from models.py
     class Meta:

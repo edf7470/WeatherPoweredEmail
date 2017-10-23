@@ -42,6 +42,8 @@ Any other values which should be calssified as "bad weather" can be added to the
 To run the Weather app automated test suite (It will take a few minutes to complete), execute the command:
 \WeatherPoweredEmail\mysite>**python manage.py test weather**
 
+\WeatherPoweredEmail\mysite>**python manage.py test wundergroundhelper**
+
 ## Django Management Command:
 To generate newsletters and send them out as emails:
 

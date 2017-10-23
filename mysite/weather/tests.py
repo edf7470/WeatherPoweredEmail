@@ -1,22 +1,24 @@
 from django.test import TestCase
 from django.template.loader import render_to_string
+from weather.service import GOOD, BAD, NEUTRAL, simplify_api_weather, simplify_api_temp
 from weather import models
 from .models import Subscription
 import datetime
-from wundergroundhelper import service
+import weather.service
+import wundergroundhelper.service
 
 
 class SubscriptionModelTests(TestCase):
 
     # Test simplify_api_weather()
     def test_simplify_api_weather_bad(self):
-        self.assertEqual(models.simplify_api_weather('sleet'), 'bad', "Sleet should classify as BAD weather.")
+        self.assertEqual(simplify_api_weather('sleet'), BAD, "Sleet should classify as BAD weather.")
 
     def test_simplify_api_weather_good(self):
-        self.assertEqual(models.simplify_api_weather('sunny'), 'good', "Sunny should classify as GOOD weather.")
+        self.assertEqual(simplify_api_weather('sunny'), GOOD, "Sunny should classify as GOOD weather.")
 
     def test_simplify_api_weather_neutral(self):
-        self.assertEqual(models.simplify_api_weather('partlycloudy'), 'neutral', "Partly Cloudy should classify as NEUTRAL weather.")
+        self.assertEqual(simplify_api_weather('partlycloudy'), NEUTRAL, "Partly Cloudy should classify as NEUTRAL weather.")
 
     # Test Subscription.get_location_breakdown()
     def test_get_location_breakdown(self):
@@ -33,19 +35,19 @@ class SubscriptionModelTests(TestCase):
         sub = Subscription(email_address='somethingG@gmail.com', location='NY,New_York')
         test_weather_conditions = sub.get_weather_conditions()
         # expected
-        c_json = service.get_api_conditions(sub.get_location_breakdown())
+        c_json = wundergroundhelper.service.get_api_conditions(sub.get_location_breakdown())
         if c_json is None:
             # fail-safe for bad json data. set weather to NEUTRAL, temperature to None
-            w_simple = 'neutral'
+            w_simple = NEUTRAL
             t_simple = None
         else:
             # find 'weather' value in json response
             weather_api = c_json['current_observation']['weather'].lower()
-            w_simple = models.simplify_api_weather(weather_api)
+            w_simple = simplify_api_weather(weather_api)
             # find 'temp_f' (temperature fahrenheit) value in json response
             temperature = c_json['current_observation']['temp_f']
             current_date = datetime.datetime.now().date()
-            t_simple = models.simplify_api_temp(temperature, current_date, sub.get_location_breakdown())
+            t_simple = simplify_api_temp(temperature, current_date, sub.get_location_breakdown())
         expected = [w_simple, t_simple, weather_api, temperature]
         self.assertAlmostEqual(test_weather_conditions[3],expected[3],delta=1)
         self.assertEqual(test_weather_conditions[0], expected[0])
@@ -55,7 +57,7 @@ class SubscriptionModelTests(TestCase):
     def test_get_weather_conditions_bad_state_input(self):
         sub = Subscription(email_address='somethingH@gmail.com', location='XX,New_York')
         weather_conditions = sub.get_weather_conditions()
-        expected = ['neutral', 'neutral', None, None]
+        expected = [NEUTRAL, NEUTRAL, None, None]
         self.assertListEqual(weather_conditions, expected, "Bad location input should return a list: ['neutral', 'neutral', None, None]")
 
 
@@ -65,20 +67,20 @@ class SubscriptionModelTests(TestCase):
         current_date = datetime.date(2016, 7, 1)
         sub = Subscription(email_address='somethingM@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
-        t_simple = models.simplify_api_temp(current_temp, current_date, location_breakdown)
-        self.assertEqual(t_simple, 'bad')
+        t_simple = simplify_api_temp(current_temp, current_date, location_breakdown)
+        self.assertEqual(t_simple, weather.service.BAD)
 
     def test_simplify_api_temp_good(self):
         current_temp = 100
         current_date = datetime.date(2016, 1, 1)
         sub = Subscription(email_address='somethingN@gmail.com', location='NY,New_York')
         location_breakdown = sub.get_location_breakdown()
-        t_simple = models.simplify_api_temp(current_temp, current_date, location_breakdown)
-        self.assertEqual(t_simple, 'good')
+        t_simple = simplify_api_temp(current_temp, current_date, location_breakdown)
+        self.assertEqual(t_simple, weather.service.GOOD)
 
     # Test emailsubject.txt
     def test_emailsubject_txt_bad_bad(self):
-        weather_conditions = ['bad', 'bad']
+        weather_conditions = [weather.service.BAD, weather.service.BAD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -87,7 +89,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_bad_good(self):
-        weather_conditions = ['bad', 'good']
+        weather_conditions = [weather.service.BAD, weather.service.GOOD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -96,7 +98,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_bad_neutral(self):
-        weather_conditions = ['bad', 'neutral']
+        weather_conditions = [weather.service.BAD, weather.service.NEUTRAL]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -105,7 +107,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_good_good(self):
-        weather_conditions = ['good', 'good']
+        weather_conditions = [weather.service.GOOD, weather.service.GOOD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -114,7 +116,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('It\'s nice out!' in subject)
 
     def test_emailsubject_txt_good_bad(self):
-        weather_conditions = ['good', 'bad']
+        weather_conditions = [weather.service.GOOD, weather.service.BAD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -124,7 +126,7 @@ class SubscriptionModelTests(TestCase):
 
 
     def test_emailsubject_txt_good_neutral(self):
-        weather_conditions = ['good', 'neutral']
+        weather_conditions = [weather.service.GOOD, weather.service.NEUTRAL]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -133,7 +135,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('It\'s nice out!' in subject)
 
     def test_emailsubject_txt_neutral_neutral(self):
-        weather_conditions = ['neutral', 'neutral']
+        weather_conditions = [weather.service.NEUTRAL, weather.service.NEUTRAL]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -143,7 +145,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('It\'s nice out!' not in subject)
 
     def test_emailsubject_txt_neutral_bad(self):
-        weather_conditions = ['neutral', 'bad']
+        weather_conditions = [weather.service.NEUTRAL, weather.service.BAD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
@@ -152,7 +154,7 @@ class SubscriptionModelTests(TestCase):
         self.assertTrue('Not so nice out?' in subject)
 
     def test_emailsubject_txt_neutral_good(self):
-        weather_conditions = ['neutral', 'good']
+        weather_conditions = [weather.service.NEUTRAL, weather.service.GOOD]
         subject_context = {
             'weather': weather_conditions[0],
             'temp': weather_conditions[1],
