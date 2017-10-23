@@ -2,7 +2,7 @@
 Klaviyo code challenge!
 
 ## Running the Weather App:
-\WeatherPoweredEmail\mysite>python manage.py runserver
+\WeatherPoweredEmail\mysite>*python manage.py runserver*
 
 In an internet browser, enter: http://127.0.0.1:8000/weather/
 
@@ -25,27 +25,27 @@ My reasoning for this decision is based on the following scenarios:
 A possibly better way to classify days as "good weather days" or "bad weather days" would be based on the individual's personal 
 preference, and/or seasonal circumstances. 
 - If someone doesn't like the heat, any summer day is "too hot."
-- In southern CA, a summer day that is 5 degrees hotter than the average might actually be considered a "bad weather day" because of the undearable heat. 
+- In southern CA, a summer day that is 5 degrees hotter than the average might actually be considered a "bad weather day" because of the unbearable heat. 
 
 Given these circumstances, 5 degrees warmer than the average would be considered a "good weather day" in the winter, but a "bad weather day" in the summer.
 
 ## Weather App Automated Tests:
 To run the Weather app automated test suite (It will take a few minutes to complete), execute the command:
-\WeatherPoweredEmail\mysite>python manage.py test weather
+\WeatherPoweredEmail\mysite>*python manage.py test weather*
 
 ## Django Management Command:
 To generate newsletters and send them out as emails:
 
-\WeatherPoweredEmail\mysite>python manage.py sendemails
+\WeatherPoweredEmail\mysite>*python manage.py sendemails*
 
 To generate newsletters and send them out as emails, with data printed, choose any combination 
 of the 'print' options (--print_all includes address, weather, newsletter:
 
-\WeatherPoweredEmail\mysite>python manage.py sendemails [--print_address] [--print_weather] [--print_newsletter] [--print_all]
+\WeatherPoweredEmail\mysite>*python manage.py sendemails [--print_address] [--print_weather] [--print_newsletter] [--print_all]*
  
 To generate and view newsletters for subscribers, but don't send the emails out:
 
-\WeatherPoweredEmail\mysite>python manage.py sendemails --no_send --print_all
+\WeatherPoweredEmail\mysite>*python manage.py sendemails --no_send --print_all*
 
 
 
