@@ -3,6 +3,7 @@ Klaviyo code challenge!
 
 ## Running the Weather App:
 \WeatherPoweredEmail\mysite>python manage.py runserver
+
 In an internet browser, enter: http://127.0.0.1:8000/weather/
 
 ## Wunderground API key - Time Limitations:
@@ -16,6 +17,7 @@ time between API calls, edit the settings.py value WUNDERGROUND_KEY
 ## Good vs Bad Weather Logic:
 Looking at emailbody.txt, I decided that the weather conditions (rainy/snowy/sunny) were more 
 important than the temperature difference, in regards to the decision about how nice the day is. 
+
 My reasoning for this decision is based on the following scenarios:
 - If it is raining/snowing/sleet, it doesn't really matter the temperature out. It's a "bad weather day."
 - If it is a winter day in upstate NY, it's cold out regardless of the average temperature, but if it's sunny out, it's still a "good weather day."
@@ -33,11 +35,16 @@ To run the Weather app automated test suite (It will take a few minutes to compl
 
 ## Django Management Command:
 To generate newsletters and send them out as emails:
+
 \WeatherPoweredEmail\mysite>python manage.py sendemails
+
 To generate newsletters and send them out as emails, with data printed, choose any combination 
 of the 'print' options (--print_all includes address, weather, newsletter:
-\WeatherPoweredEmail\mysite>python manage.py sendemails [--print_address] [--print_weather] [--print_newsletter] [--print_all] 
+
+\WeatherPoweredEmail\mysite>python manage.py sendemails [--print_address] [--print_weather] [--print_newsletter] [--print_all]
+ 
 To generate and view newsletters for subscribers, but don't send the emails out:
+
 \WeatherPoweredEmail\mysite>python manage.py sendemails --no_send --print_all
 
 
